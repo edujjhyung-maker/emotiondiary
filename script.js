@@ -34,7 +34,7 @@ function processAndRender(rawData) {
             emotion: classifyEmotion(row[2]),
             action: classifyAction(diaryText)
         };
-    }).filter(d => d !== null).sort((a,b) => new Array(a.date > b.date ? 1 : -1));
+    }).filter(d => d !== null).sort((a, b) => a.date > b.date ? 1 : -1); // 💡 오타 수정 완료!
 
     // 3. 시각화 컴포넌트 렌더링
     renderTrendChart(processedData);
@@ -152,7 +152,6 @@ function analyzeInsights(data) {
     const alertList = document.getElementById('alert-list');
     alertList.innerHTML = '';
 
-    // 자해, 자살 징후 혹은 고위험 키워드 자동 검출 시스템
     const dangerKeywords = ['눈 감고', '할아버지처럼', '죽고싶', '편안하게 눈', '사라지고'];
     let alertsFound = 0;
 
@@ -169,14 +168,13 @@ function analyzeInsights(data) {
     if (alertsFound > 0) alertZone.classList.remove('hidden');
     else alertZone.classList.add('hidden');
 
-    // 요일별 최저점 분석 로직
     let mondayScores = data.filter(d => new Date(d.date).getDay() === 1).map(d => d.score);
     if(mondayScores.length > 0) {
         let avgMonday = mondayScores.reduce((a,b)=>a+b, 0) / mondayScores.length;
         if(avgMonday < -10) {
-            document.getElementById('insight-weekly').innerHTML = `이 학생은 월요일 평균 감정 점수가 <strong>${avgMonday.toFixed(1)}점</strong>으로 주중 가장 낮습니다. 전형적인 <b>'환경 진입 거부 리듬'</b>을 보이고 있으니 월요일 아침 첫 대면 관찰에 유의하십시오.`;
+            document.getElementById('insight-weekly').innerHTML = `이 학생은 월요일 평균 감정 점수가 <strong>${avgMonday.toFixed(1)}점</strong>으로 주중 가장 낮습니다. 전형적인 <b>'환경 진입 거부 리듬(월요일 증후군)'</b>을 보이고 있으니 월요일 아침 첫 대면 관찰과 정서 지지에 특별히 유의하십시오.`;
         } else {
-            document.getElementById('insight-weekly').textContent = "요일별 특이 추이 패턴이 발견되지 않았습니다. 지속적인 일상 모니터링이 권장됩니다.";
+            document.getElementById('insight-weekly').textContent = "요일별 특이 추이 패턴이 크게 나타나지 않았습니다. 지속적인 일상 모니터링이 권장됩니다.";
         }
     }
 }
