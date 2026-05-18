@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학생 일기 기반 정서 모니터링 시스템</title>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <script defer src="script.js"></script>
+</head>
+<body>
+
+    <header>
+        <h1>📊 학생 정서 데이터 분석 대시보드</h1>
+        <div class="upload-zone">
+            <label for="csv-file" class="upload-btn">📁 학생 CSV 파일 업로드</label>
+            <input type="file" id="csv-file" accept=".csv">
+            <span id="file-name">선택된 파일 없음</span>
+        </div>
+    </header>
+
+    <div id="upload-placeholder" class="placeholder-box">
+        <h2>상담할 학생의 감정일기 데이터(.csv)를 업로드해 주세요.</h2>
+        <p>엑셀 파일(날짜, 일기, 감정태그, 신호등, 점수 순)을 CSV(쉼표로 분리) 형태로 저장하여 올리면 즉시 심층 분석이 시작됩니다.</p>
+    </div>
+
+    <main id="dashboard-content" class="hidden">
+        <div class="dashboard-left">
+            <div class="card">
+                <div class="card-title">📉 일별 감정 점수 추이 (마우스 오버 시 일기 본문 확인)</div>
+                <div id="trend-chart" class="chart-container"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🔀 [상황 ➡️ 감정 ➡️ 행동] 심리 방어기제 매커니즘 흐름 분석</div>
+                <div id="sankey-chart" class="chart-container"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📊 주요 정서별 원인 상황 데이터 (누적 분포)</div>
+                <div id="stacked-bar-chart" class="chart-container"></div>
+            </div>
+        </div>
+
+        <div class="insight-sidebar">
+            <div class="card alert-card hidden" id="danger-alert-zone">
+                <div class="card-title text-danger">🚨 고위험 위기 신호 (Critical Alerts)</div>
+                <div id="alert-list"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🔍 데이터 기반 패턴 해석 가이드</div>
+                <div class="insight-section">
+                    <h4>1. 요일별 리듬 파악 (월요일 증후군 체크)</h4>
+                    <p id="insight-weekly">데이터 로딩 중...</p>
+                </div>
+                <div class="insight-section">
+                    <h4>2. 정서 유발 핵심 트리거(Triggers)</h4>
+                    <p>학생이 호소하는 부정적 정서의 유발 비율은 하단의 '누적 분포 차트' 색상을 통해 직관적으로 증명됩니다. 지배적인 색상이 학업인지, 또래인지 확인한 뒤 개입 방향을 결정하세요.</p>
+                </div>
+                <div class="insight-section">
+                    <h4>3. 행동 패턴 읽기</h4>
+                    <p>산키 다이어그램의 최종 우측 노드가 '무기력/회피'나 '갈등 표출'로 굵게 이어질 경우, 이는 아이의 고의적 반항이 아니라 심리적으로 압도(Overwhelmed)되었을 때 뇌가 작동시키는 자동 방어기제(도망 또는 전투)입니다.</p>
+                </div>
+            </div>
+
+            <div class="card text-success-zone">
+                <div class="card-title text-success">🌱 추천 교육적 대응 매뉴얼</div>
+                <div class="intervention-box">
+                    <p><strong>• 정서적 정화 단계:</strong> 점수 추이 그래프가 급락한 날짜의 일기 텍스트를 기반으로 "이날 서운한 감정이 많았구나"라며 아이의 주관적 감정을 먼저 수용해 주세요.</p>
+                    <p><strong>• 행동 스크립트 제공:</strong> 소통 거부나 회피가 잦은 학생에겐 대안 행동(예: 당황스러울 때 교사에게 단독으로 도움을 청하는 방법)을 1:1 상담 시 직접 훈련시키는 것이 효과적입니다.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
