@@ -1,26 +1,58 @@
 document.getElementById('csv-file').addEventListener('change', handleFileUpload);
 
+// 1. 외부 라이브러리 없이 자체적으로 CSV 파일을 읽어오는 함수
 function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
 
     document.getElementById('file-name').textContent = file.name;
 
-    // PapaParse 라이브러리로 CSV 파싱 진행
-    Papa.parse(file, {
-        complete: function(results) {
-            processAndRender(results.data);
-        },
-        skipEmptyLines: true
-    });
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const text = e.target.result;
+        const parsedData = parseCSV(text); // 자체 내장 파서 실행
+        processAndRender(parsedData);
+    };
+    reader.readAsText(file, 'UTF-8'); // 한글 깨짐 방지
+}
+
+// 2. 따옴표와 쉼표, 줄바꿈을 완벽하게 계산하는 내장 CSV 파싱 로직
+function parseCSV(text) {
+    let lines = [];
+    let row = [""];
+    let inQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+        let c = text[i];
+        let next = text[i+1];
+
+        if (c === '"') {
+            if (inQuotes && next === '"') { 
+                row[row.length - 1] += '"'; 
+                i++; 
+            } else { 
+                inQuotes = !inQuotes; 
+            }
+        } else if (c === ',' && !inQuotes) {
+            row.push('');
+        } else if ((c === '\r' || c === '\n') && !inQuotes) {
+            if (c === '\r' && next === '\n') { i++; }
+            lines.push(row);
+            row = [''];
+        } else {
+            row[row.length - 1] += c;
+        }
+    }
+    if (row.length > 1 || row[0] !== '') lines.push(row);
+    return lines;
 }
 
 function processAndRender(rawData) {
-    // 1. 레이아웃 전환 (가이드 숨기고 대시보드 표출)
+    // 레이아웃 전환 (가이드 숨기고 대시보드 표출)
     document.getElementById('upload-placeholder').classList.add('hidden');
     document.getElementById('dashboard-content').classList.remove('hidden');
 
-    // 2. 데이터 구조화 작업
+    // 데이터 구조화 작업
     let processedData = rawData.map(row => {
         if(row.length < 5) return null;
         const diaryText = row[1] || '';
@@ -34,14 +66,14 @@ function processAndRender(rawData) {
             emotion: classifyEmotion(row[2]),
             action: classifyAction(diaryText)
         };
-    }).filter(d => d !== null).sort((a, b) => a.date > b.date ? 1 : -1); // 💡 오타 수정 완료!
+    }).filter(d => d !== null).sort((a, b) => a.date > b.date ? 1 : -1);
 
-    // 3. 시각화 컴포넌트 렌더링
+    // 시각화 컴포넌트 렌더링
     renderTrendChart(processedData);
     renderSankeyChart(processedData);
     renderStackedBarChart(processedData);
 
-    // 4. 교사 인사이트 자동 추출
+    // 교사 인사이트 자동 추출
     analyzeInsights(processedData);
 }
 
